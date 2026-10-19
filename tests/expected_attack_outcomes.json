@@ -1,0 +1,188 @@
+{
+ "reconstructed": {
+  "A01a": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A01b": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A01c": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A02a": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A02b": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A02c": [
+   "ACCEPT",
+   "Vulnerable in the tested configuration"
+  ],
+  "A03a": [
+   "ACCEPT",
+   "Vulnerable in the tested configuration"
+  ],
+  "A03b": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A04a": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A04b": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A04c": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A05a": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A05b": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A05c": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A06-M1.CT": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A06-M1.D": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A06-M1.RN1": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A06-M1.T6LN": [
+   "ACCEPT",
+   "Vulnerable in the tested configuration"
+  ],
+  "A06-M1.Tag6LN": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A06-M2.A1": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A06-M2.CT1": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A06-M2.M": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A06-M2.RN2": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A06-M2.T6C": [
+   "ACCEPT",
+   "Vulnerable in the tested configuration"
+  ],
+  "A06-M2.Tag6LC": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A06b-1": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A06b-2": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A07a": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A07b": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A08": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A09a": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A09b": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A10a": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A10b": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A10c": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A11a": [
+   "ACCEPT",
+   "Protected in the tested configuration"
+  ],
+  "A11b": [
+   "REJECT",
+   "Vulnerable in the tested configuration"
+  ],
+  "A12a": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A12b": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A12c": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A13": [
+   "MIXED",
+   "Partially protected"
+  ],
+  "A14": [
+   "ACCEPT",
+   "Protected in the tested configuration"
+  ],
+  "A15": [
+   "REJECT",
+   "Protected in the tested configuration"
+  ],
+  "A16": [
+   "REJECT",
+   "Partially protected"
+  ],
+  "A17": [
+   "ACCEPT",
+   "Vulnerable in the tested configuration"
+  ],
+  "A18": [
+   "REJECT",
+   "Partially protected"
+  ]
+ }
+}
