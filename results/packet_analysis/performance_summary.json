@@ -1,0 +1,44 @@
+[
+ {
+  "metric": "Hash ops, logical, AKE phase",
+  "paper": 8,
+  "measured": 12,
+  "note": "audited overhead.py hard-codes 8; measured = 12"
+ },
+ {
+  "metric": "AEAD ops executed",
+  "paper": 2,
+  "measured": 4,
+  "note": "paper convention: once per message = 2"
+ },
+ {
+  "metric": "M1 bits",
+  "paper": 416,
+  "measured": 416,
+  "note": "match"
+ },
+ {
+  "metric": "M2 bits",
+  "paper": 608,
+  "measured": 608,
+  "note": "matches only via the reconstructed 64-bit T6C (paper: 32 bits -> 576)"
+ },
+ {
+  "metric": "Total bits",
+  "paper": 1024,
+  "measured": 1024,
+  "note": "paper text also says ~1010"
+ },
+ {
+  "metric": "6LN stored bytes",
+  "paper": 32,
+  "measured": 40,
+  "note": "attributes held by the object (incl. id6ln); 32 B are actually read"
+ },
+ {
+  "metric": "6LC record stored bytes",
+  "paper": 60,
+  "measured": 60,
+  "note": "includes 4 B non-functional padding"
+ }
+]

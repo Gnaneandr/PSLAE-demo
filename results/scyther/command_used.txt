@@ -1,0 +1,1 @@
+scyther-linux -r 100 -m 0 -A scyther/pslae.spdl

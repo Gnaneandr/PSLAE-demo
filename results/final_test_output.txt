@@ -1,0 +1,42 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/claude/PSLAE_complete_final
+collecting ... collected 34 items
+
+tests/test_aid6ln_rotation.py::test_aid6ln_rotates_after_one_session PASSED [  2%]
+tests/test_aid6ln_rotation.py::test_aid6ln_differs_across_two_consecutive_sessions PASSED [  5%]
+tests/test_aid6ln_rotation.py::test_authentication_succeeds_after_rotation PASSED [  8%]
+tests/test_aid6ln_rotation.py::test_controller_db_rekeyed_correctly PASSED [ 11%]
+tests/test_aid6ln_rotation.py::test_rotation_closes_the_D_linkability_gap PASSED [ 14%]
+tests/test_aid6ln_rotation.py::test_multiple_sensors_independently_rotate_without_collision PASSED [ 17%]
+tests/test_aid6ln_rotation.py::test_ake3_does_not_require_id6lc_and_still_authenticates PASSED [ 20%]
+tests/test_aid6ln_rotation.py::test_ake3_sc1_integrity_is_still_enforced_without_id6lc PASSED [ 23%]
+tests/test_ake3_id6lc_reconstruction.py::test_1_normal_ake3_success PASSED [ 26%]
+tests/test_ake3_id6lc_reconstruction.py::test_2_wrong_long_term_secret_rejected PASSED [ 29%]
+tests/test_ake3_id6lc_reconstruction.py::test_3_tampered_ct1_rejected PASSED [ 32%]
+tests/test_ake3_id6lc_reconstruction.py::test_4_incorrect_sc1_rejected PASSED [ 35%]
+tests/test_ake3_id6lc_reconstruction.py::test_5_session_key_agreement PASSED [ 38%]
+tests/test_ake_failures.py::test_modified_ciphertext_rejected_by_controller PASSED [ 41%]
+tests/test_ake_failures.py::test_modified_tag_rejected_by_controller PASSED [ 44%]
+tests/test_ake_failures.py::test_modified_D_rejected_unknown_sensor PASSED [ 47%]
+tests/test_ake_failures.py::test_unregistered_sensor_rejected PASSED     [ 50%]
+tests/test_ake_failures.py::test_modified_m2_ciphertext_rejected_by_sensor PASSED [ 52%]
+tests/test_ake_failures.py::test_modified_m2_tag_rejected_by_sensor PASSED [ 55%]
+tests/test_ake_failures.py::test_modified_a1_rejected_by_sensor PASSED   [ 58%]
+tests/test_ake_failures.py::test_expired_m1_timestamp_rejected PASSED    [ 61%]
+tests/test_ake_failures.py::test_expired_m2_timestamp_rejected PASSED    [ 64%]
+tests/test_ake_success.py::test_full_ake_session_key_agreement PASSED    [ 67%]
+tests/test_ake_success.py::test_ake1_message_shape PASSED                [ 70%]
+tests/test_ake_success.py::test_ake2_message_shape PASSED                [ 73%]
+tests/test_ake_success.py::test_secret_rotation_after_successful_session PASSED [ 76%]
+tests/test_ake_success.py::test_two_consecutive_sessions_succeed_after_rotation PASSED [ 79%]
+tests/test_registration.py::test_registration_creates_matching_records PASSED [ 82%]
+tests/test_registration.py::test_aid6ln_matches_definition PASSED        [ 85%]
+tests/test_registration.py::test_each_registration_is_unique PASSED      [ 88%]
+tests/test_registration.py::test_bad_id_length_rejected PASSED           [ 91%]
+tests/test_replay_and_traceability.py::test_exact_replay_of_m1_rejected_after_first_success PASSED [ 94%]
+tests/test_replay_and_traceability.py::test_fresh_random_numbers_differ_across_sessions PASSED [ 97%]
+tests/test_replay_and_traceability.py::test_D_linkability_gap_is_resolved_by_aid6ln_rotation PASSED [100%]
+
+============================== 34 passed in 0.05s ==============================

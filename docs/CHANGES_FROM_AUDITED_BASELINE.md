@@ -1,0 +1,4 @@
+# CHANGES_FROM_AUDITED_BASELINE
+**Not modified:** everything in `src/` (byte-identical, test-enforced via `SRC_SHA256.txt`), the audited tests, the audited docs, `scyther/pslae.spdl`, `scyther/bin/`.
+**Added:** `demo.py`, `app.py` (Streamlit dashboard), `demo/` (runtime/tracing, stage demos, packet inspector, parameter register, attack lab, performance, verification, CLI, menu), new tests (`tests/test_demo_*.py`, `test_packets_parameters_ops.py`, `test_attack_lab.py`, `test_dashboard.py`, `expected_attack_outcomes.json`), the new documents listed in the README, `results/{fresh_test_run,attack_lab,packet_analysis,verification}`, `docs/sequence_diagram.svg`.
+**Changed:** root `README.md`, `requirements.txt` (unchanged content) plus `requirements-ui.txt`, `tests/conftest.py` (adds the project root to `sys.path`).

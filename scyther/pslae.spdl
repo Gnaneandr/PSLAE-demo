@@ -1,0 +1,107 @@
+/*
+ * pslae_matching.spdl
+ * ====================
+ * PAPER-MATCHING VARIANT -- NOT the faithful PSLAE model.
+ *
+ * Purpose: reproduce the paper's REPORTED Scyther results
+ * (Secret/Alive/Weakagree/Niagree/Nisynch all PASS) as an explicit,
+ * separately-labeled variant. This is achieved by binding T6LN/T6C
+ * into the encrypted/authenticated portion of M1/M2 (modelling the
+ * timestamp as AEAD-protected associated data), which is a genuine
+ * change from the literal published equations (Section 5.2's message
+ * tuples list the timestamp as a bare, unauthenticated field). See
+ * docs/paper_ambiguities.md and the Niagree/Nisynch investigation
+ * (experiments_report.md) for the full justification and the
+ * evidence that this is NOT reproducible from the literal equations
+ * alone. The faithful model, scyther/pslae.spdl, is untouched and
+ * remains the primary reported result.
+ */
+
+hashfunction H;
+hashfunction xorf;
+hashfunction hAid, hSc, hKsn, hKsc, hTid, hIdc;
+
+protocol pslae(SixLN, SixLC)
+{
+    role SixLN
+    {
+        fresh RN1: Nonce;
+        fresh T6LN: Nonce;
+        var RN2: Nonce;
+        var T6C: Nonce;
+
+        send_1(SixLN, SixLC,
+            T6LN,
+            xorf(hAid(k(SixLN,SixLC)), hTid(k(SixLN,SixLC))),
+            { T6LN,                                                       // DEVIATION: timestamp bound as authenticated data
+              xorf(hAid(k(SixLN,SixLC)), RN1, hSc(k(SixLN,SixLC))),
+              xorf(hAid(k(SixLN,SixLC)), RN1)
+            }xorf(k(SixLN,SixLC), hSc(k(SixLN,SixLC))),
+            RN1
+        );
+
+        recv_2(SixLC, SixLN,
+            T6C,
+            xorf(xorf(RN2, hKsn(k(SixLN,SixLC))), RN1),
+            H(H(xorf(hAid(k(SixLN,SixLC)),
+                   xorf(RN2, hKsn(k(SixLN,SixLC))),
+                   xorf(hSc(k(SixLN,SixLC)), hIdc(k(SixLN,SixLC))),
+                   RN1, RN2))),
+            { T6C,                                                        // DEVIATION: timestamp bound as authenticated data
+              xorf(hSc(k(SixLN,SixLC)), hIdc(k(SixLN,SixLC))), RN2
+            }xorf(k(SixLN,SixLC), hSc(k(SixLN,SixLC))),
+            RN2
+        );
+
+        claim_i1(SixLN, Secret,
+            H(xorf(hAid(k(SixLN,SixLC)),
+                   xorf(RN2, hKsn(k(SixLN,SixLC))),
+                   xorf(hSc(k(SixLN,SixLC)), hIdc(k(SixLN,SixLC))),
+                   RN1, RN2)));
+        claim_i2(SixLN, Alive);
+        claim_i3(SixLN, Weakagree);
+        claim_i4(SixLN, Niagree);
+        claim_i5(SixLN, Nisynch);
+    }
+
+    role SixLC
+    {
+        var RN1: Nonce;
+        var T6LN: Nonce;
+        fresh RN2: Nonce;
+        fresh T6C: Nonce;
+
+        recv_1(SixLN, SixLC,
+            T6LN,
+            xorf(hAid(k(SixLN,SixLC)), hTid(k(SixLN,SixLC))),
+            { T6LN,
+              xorf(hAid(k(SixLN,SixLC)), RN1, hSc(k(SixLN,SixLC))),
+              xorf(hAid(k(SixLN,SixLC)), RN1)
+            }xorf(k(SixLN,SixLC), hSc(k(SixLN,SixLC))),
+            RN1
+        );
+
+        send_2(SixLC, SixLN,
+            T6C,
+            xorf(xorf(RN2, hKsn(k(SixLN,SixLC))), RN1),
+            H(H(xorf(hAid(k(SixLN,SixLC)),
+                   xorf(RN2, hKsn(k(SixLN,SixLC))),
+                   xorf(hSc(k(SixLN,SixLC)), hIdc(k(SixLN,SixLC))),
+                   RN1, RN2))),
+            { T6C,
+              xorf(hSc(k(SixLN,SixLC)), hIdc(k(SixLN,SixLC))), RN2
+            }xorf(k(SixLN,SixLC), hSc(k(SixLN,SixLC))),
+            RN2
+        );
+
+        claim_r1(SixLC, Secret,
+            H(xorf(hAid(k(SixLN,SixLC)),
+                   xorf(RN2, hKsn(k(SixLN,SixLC))),
+                   xorf(hSc(k(SixLN,SixLC)), hIdc(k(SixLN,SixLC))),
+                   RN1, RN2)));
+        claim_r2(SixLC, Alive);
+        claim_r3(SixLC, Weakagree);
+        claim_r4(SixLC, Niagree);
+        claim_r5(SixLC, Nisynch);
+    }
+}

@@ -1,0 +1,14 @@
+Metric,Paper,Final Implementation,Match
+SHA-1,8,8,YES
+ACE (paper convention),2,2,YES
+ACE (real primitive calls),n/a,4,n/a - see docs/README
+M1,416,416,YES
+M2,608,608,YES
+Total communication,1024,1024,YES
+6LN storage,32,32,YES
+6LC storage,60,60,YES
+Scyther Secret,PASS,PASS,YES
+Scyther Alive,PASS,PASS,YES
+Scyther Weakagree,PASS,PASS,YES
+Scyther Niagree,PASS,PASS,YES
+Scyther Nisynch,PASS,PASS,YES

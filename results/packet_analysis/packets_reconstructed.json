@@ -1,0 +1,141 @@
+{
+ "M1": {
+  "rows": [
+   {
+    "field": "T6LN",
+    "purpose": "sensor timestamp (freshness)",
+    "bits": 32,
+    "bytes": 4,
+    "paper_bits": 32,
+    "differs": false,
+    "source": "clock (AKE1)",
+    "protection": "clear; freshness window only - NOT covered by the tag"
+   },
+   {
+    "field": "D",
+    "purpose": "alias mask AID6LN xor TID6LC (lookup key)",
+    "bits": 64,
+    "bytes": 8,
+    "paper_bits": 64,
+    "differs": false,
+    "source": "AID6LN xor TID6LC",
+    "protection": "clear; masks AID6LN; used for DB lookup"
+   },
+   {
+    "field": "CT",
+    "purpose": "encrypted A||B",
+    "bits": 128,
+    "bytes": 16,
+    "paper_bits": 128,
+    "differs": false,
+    "source": "ACE encrypt of A||B",
+    "protection": "encrypted (AES-CTR) + covered by tag"
+   },
+   {
+    "field": "Tag6LN",
+    "purpose": "authentication tag of M1",
+    "bits": 128,
+    "bytes": 16,
+    "paper_bits": 128,
+    "differs": false,
+    "source": "ACE tag over AD||CT",
+    "protection": "authenticator (HMAC-SHA256/128)"
+   },
+   {
+    "field": "RN1",
+    "purpose": "sensor fresh random",
+    "bits": 64,
+    "bytes": 8,
+    "paper_bits": 64,
+    "differs": false,
+    "source": "fresh random (AKE1)",
+    "protection": "clear; cross-checked against B inside CT"
+   }
+  ],
+  "measured_bits": 416,
+  "measured_bytes": 52,
+  "literal_paper_field_bits": 416,
+  "paper_reported_bits": 416,
+  "diff_vs_paper_reported": 0,
+  "diff_vs_literal_fields": 0,
+  "serialized_length_bytes": 52,
+  "framing_headers_padding": "none: messages are Python dicts of byte strings; no framing/header/padding is added by the code (the demo's wire length is the plain concatenation)"
+ },
+ "M2": {
+  "rows": [
+   {
+    "field": "T6C",
+    "purpose": "controller timestamp (freshness)",
+    "bits": 64,
+    "bytes": 8,
+    "paper_bits": 32,
+    "differs": true,
+    "source": "clock (AKE2)",
+    "protection": "clear; freshness window only - NOT covered by the tag"
+   },
+   {
+    "field": "A1",
+    "purpose": "B1 xor RN1 (lets the sensor verify the controller)",
+    "bits": 64,
+    "bytes": 8,
+    "paper_bits": 64,
+    "differs": false,
+    "source": "B1 xor RN1",
+    "protection": "clear; recomputed by 6LN from K6LN, RN1, RN2"
+   },
+   {
+    "field": "M",
+    "purpose": "SHA-1(SK) key confirmation",
+    "bits": 160,
+    "bytes": 20,
+    "paper_bits": 160,
+    "differs": false,
+    "source": "SHA-1(SK)",
+    "protection": "clear; key-confirmation hash H(SK)"
+   },
+   {
+    "field": "CT1",
+    "purpose": "encrypted Sc1||RN2",
+    "bits": 128,
+    "bytes": 16,
+    "paper_bits": 128,
+    "differs": false,
+    "source": "ACE encrypt of Sc1||RN2",
+    "protection": "encrypted (AES-CTR) + covered by tag"
+   },
+   {
+    "field": "Tag6LC",
+    "purpose": "authentication tag of M2",
+    "bits": 128,
+    "bytes": 16,
+    "paper_bits": 128,
+    "differs": false,
+    "source": "ACE tag over AD||CT1",
+    "protection": "authenticator (HMAC-SHA256/128)"
+   },
+   {
+    "field": "RN2",
+    "purpose": "controller fresh random",
+    "bits": 64,
+    "bytes": 8,
+    "paper_bits": 64,
+    "differs": false,
+    "source": "fresh random (AKE2)",
+    "protection": "clear; cross-checked against RN2 inside CT1"
+   }
+  ],
+  "measured_bits": 608,
+  "measured_bytes": 76,
+  "literal_paper_field_bits": 576,
+  "paper_reported_bits": 608,
+  "diff_vs_paper_reported": 0,
+  "diff_vs_literal_fields": 32,
+  "serialized_length_bytes": 76,
+  "framing_headers_padding": "none: messages are Python dicts of byte strings; no framing/header/padding is added by the code (the demo's wire length is the plain concatenation)"
+ },
+ "total": {
+  "measured_bits": 1024,
+  "paper_reported_bits": 1024,
+  "literal_paper_field_bits": 992
+ }
+}

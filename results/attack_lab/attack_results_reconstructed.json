@@ -1,0 +1,1133 @@
+[
+ {
+  "id": "A01a",
+  "title": "Exact replay of M1 after a completed session",
+  "plain_english": "The attacker recorded M1 of a successful login and sends the identical bytes again.",
+  "attacker": "Passive capture + retransmission on the open channel.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Resend M1 unchanged to the 6LC (clock unchanged, inside DeltaT).",
+  "steps": [
+   "1st delivery: ACCEPT",
+   "2nd delivery: REJECT (alias lookup in the 6LC database)",
+   "6LC replay-cache sets contain 0 entries (present in the class, never filled by step_ake2)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "alias lookup in the 6LC database",
+  "expected": "REJECT",
+  "observed": "Step AKE2: AID6LN not found in 6LC database",
+  "interpretation": "Rejection comes from the STATE TRANSITION after the first session (the stored Sc and alias are replaced), not from a replay cache or the timestamp (still fresh). This is a property of the reconstructed state update, not a literal paper mechanism.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A01a-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A01b",
+  "title": "Replay of M1 before the sensor has processed M2",
+  "plain_english": "The same M1 reaches the controller twice in a row (duplicate delivery).",
+  "attacker": "Network duplication or attacker retransmission.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Deliver M1 twice back to back.",
+  "steps": [
+   "1st: ACCEPT",
+   "2nd: REJECT (alias lookup in the 6LC database)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "alias lookup in the 6LC database",
+  "expected": "REJECT",
+  "observed": "Step AKE2: AID6LN not found in 6LC database",
+  "interpretation": "The controller updates state immediately after the first AKE2, so the duplicate fails.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A01b-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A01c",
+  "title": "Replay of M1 from the SECOND completed session",
+  "plain_english": "Replay an M1 recorded in a later session (after the stored state has already been rotated once).",
+  "attacker": "Passive capture + retransmission, inside DeltaT.",
+  "original_message": {
+   "T6LN": "6553f101",
+   "D": "18348f6d542c0ec4",
+   "CT": "1262ed6a89f217d9c3a2efafe98009ec",
+   "Tag6LN": "973636bdb02db5ccc29c342d06fb7958",
+   "RN1": "99438015164d2a3f"
+  },
+  "action": "Run 3 sessions; resend session 2's M1 (timestamp still fresh).",
+  "steps": [
+   "replay: REJECT (alias lookup in the 6LC database)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "alias lookup in the 6LC database",
+  "expected": "REJECT",
+  "observed": "Step AKE2: AID6LN not found in 6LC database",
+  "interpretation": "Rejected: the reconstructed alias rotation changes the stored state every session, so a recorded M1 is only valid once.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A01c-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A02a",
+  "title": "Stale M1 (60 s old)",
+  "plain_english": "A message older than the allowed window is delivered.",
+  "attacker": "Delays or stores traffic.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Deliver M1 after 60 s (DeltaT = 5 s).",
+  "steps": [
+   "T6LN = 1700000000, now = 1700000060, DeltaT = 5.0",
+   "response: REJECT (freshness window)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "freshness window",
+  "expected": "REJECT",
+  "observed": "Step AKE2: M1 timestamp T6LN not fresh",
+  "interpretation": "Freshness window works for honest, unmodified timestamps.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A02a-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A02b",
+  "title": "Stale M2 (60 s old)",
+  "plain_english": "The controller's reply arrives too late.",
+  "attacker": "Delays the reply.",
+  "original_message": {
+   "T6C": "000000006553f100",
+   "A1": "6c96683e6794137c",
+   "M": "9b01426f1659a830f4ed2e8e6aedc3868827c1e0",
+   "CT1": "8818a53ed672f79bab985b8468aff33f",
+   "Tag6LC": "3450bab340dd6d7868e11294c7549f2e",
+   "RN2": "e74c20d486254c5b"
+  },
+  "action": "Deliver M2 to the sensor after 60 s.",
+  "steps": [
+   "response: REJECT (freshness window)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "freshness window",
+  "expected": "REJECT",
+  "observed": "Step AKE3: M2 timestamp T6C not fresh",
+  "interpretation": "Same freshness check at the sensor.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A02b-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A02c",
+  "title": "Future-dated timestamp (+3600 s)",
+  "plain_english": "A message stamped one hour in the future.",
+  "attacker": "Controls a clock or edits the unauthenticated timestamp.",
+  "original_message": {
+   "T6LN": "6553ff10",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Deliver an M1 whose T6LN is 3600 s ahead of the controller's clock.",
+  "steps": [
+   "response: ACCEPT"
+  ],
+  "outcome": "ACCEPT",
+  "responsible_check": "-",
+  "expected": "REJECT (a symmetric window would reject)",
+  "observed": "accepted",
+  "interpretation": "The code tests `tr - T6LN > DeltaT` only, so negative differences always pass. Minor, but a real deviation from the paper's |Tr - T| form.",
+  "classification": "Vulnerable in the tested configuration",
+  "automated_test": "test_attack_lab[A02c-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A03a",
+  "title": "Timestamp refresh on an intercepted, undelivered M1 (delay attack)",
+  "plain_english": "The attacker blocks M1, waits until it is stale, rewrites only the timestamp to 'now' and delivers it.",
+  "attacker": "Active man-in-the-middle on the channel; no secrets needed.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Replace T6LN by the current time (all other fields untouched), deliver to the 6LC, withhold M2.",
+  "steps": [
+   "forged M1: ACCEPT",
+   "attacker withholds M2 (sensor never sees it)",
+   "sensor's next honest M1: REJECT (alias lookup in the 6LC database)"
+  ],
+  "outcome": "ACCEPT",
+  "responsible_check": "-",
+  "expected": "REJECT",
+  "observed": "accepted",
+  "interpretation": "T6LN is not covered by the tag, so the old M1 passes. The controller then updates its state while the sensor does not: the two sides are desynchronised and later honest sessions fail (DoS). The attacker cannot learn SK.",
+  "classification": "Vulnerable in the tested configuration",
+  "automated_test": "test_attack_lab[A03a-reconstructed]",
+  "extra": {
+   "desync_followup": "REJECT"
+  }
+ },
+ {
+  "id": "A03b",
+  "title": "Timestamp refresh on an already-completed M1",
+  "plain_english": "Same rewrite, but the session had already finished.",
+  "attacker": "Passive capture, then rewrites the timestamp.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Rewrite T6LN to now and resend.",
+  "steps": [
+   "response: REJECT (alias lookup in the 6LC database)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "alias lookup in the 6LC database",
+  "expected": "REJECT",
+  "observed": "Step AKE2: AID6LN not found in 6LC database",
+  "interpretation": "Protection again comes from the state update (stored Sc/alias changed), not from timestamp integrity.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A03b-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A04a",
+  "title": "M1 ciphertext modified",
+  "plain_english": "One bit of M1's CT is flipped in transit.",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Flip one bit of CT.",
+  "steps": [
+   "response: REJECT (tag verification of M1)",
+   "no plaintext is used after the failed tag comparison (state unchanged)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M1",
+  "expected": "REJECT",
+  "observed": "Step AKE2: Tag6LN mismatch (message integrity/authenticity check failed)",
+  "interpretation": "Tag = HMAC-SHA256(Kc, AD||CT)[:128 bit] compared in constant time. The inverse-free cipher still computes a plaintext, but it is discarded before any use.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A04a-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A04b",
+  "title": "M1 ciphertext (last bit) modified",
+  "plain_english": "One bit of M1's CT is flipped in transit.",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Flip one bit of CT.",
+  "steps": [
+   "response: REJECT (tag verification of M1)",
+   "no plaintext is used after the failed tag comparison (state unchanged)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M1",
+  "expected": "REJECT",
+  "observed": "Step AKE2: Tag6LN mismatch (message integrity/authenticity check failed)",
+  "interpretation": "Tag = HMAC-SHA256(Kc, AD||CT)[:128 bit] compared in constant time. The inverse-free cipher still computes a plaintext, but it is discarded before any use.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A04b-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A05a",
+  "title": "M1 authentication tag modified",
+  "plain_english": "One bit of M1's Tag6LN is flipped in transit.",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Flip one bit of Tag6LN.",
+  "steps": [
+   "response: REJECT (tag verification of M1)",
+   "no plaintext is used after the failed tag comparison (state unchanged)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M1",
+  "expected": "REJECT",
+  "observed": "Step AKE2: Tag6LN mismatch (message integrity/authenticity check failed)",
+  "interpretation": "Tag = HMAC-SHA256(Kc, AD||CT)[:128 bit] compared in constant time. The inverse-free cipher still computes a plaintext, but it is discarded before any use.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A05a-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A05b",
+  "title": "M1 authentication tag (last bit) modified",
+  "plain_english": "One bit of M1's Tag6LN is flipped in transit.",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Flip one bit of Tag6LN.",
+  "steps": [
+   "response: REJECT (tag verification of M1)",
+   "no plaintext is used after the failed tag comparison (state unchanged)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M1",
+  "expected": "REJECT",
+  "observed": "Step AKE2: Tag6LN mismatch (message integrity/authenticity check failed)",
+  "interpretation": "Tag = HMAC-SHA256(Kc, AD||CT)[:128 bit] compared in constant time. The inverse-free cipher still computes a plaintext, but it is discarded before any use.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A05b-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A04c",
+  "title": "M2 CT1 modified",
+  "plain_english": "One bit of M2's CT1 is flipped.",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {
+   "T6C": "000000006553f100",
+   "A1": "6c96683e6794137c",
+   "M": "9b01426f1659a830f4ed2e8e6aedc3868827c1e0",
+   "CT1": "8818a53ed672f79bab985b8468aff33f",
+   "Tag6LC": "3450bab340dd6d7868e11294c7549f2e",
+   "RN2": "e74c20d486254c5b"
+  },
+  "action": "Flip one bit of CT1.",
+  "steps": [
+   "response: REJECT (tag verification of M2)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M2",
+  "expected": "REJECT",
+  "observed": "Step AKE3: Tag6LC mismatch (message integrity/authenticity check failed)",
+  "interpretation": "Same tag check at the sensor.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A04c-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A05c",
+  "title": "M2 Tag6LC modified",
+  "plain_english": "One bit of M2's Tag6LC is flipped.",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {
+   "T6C": "000000006553f100",
+   "A1": "6c96683e6794137c",
+   "M": "9b01426f1659a830f4ed2e8e6aedc3868827c1e0",
+   "CT1": "8818a53ed672f79bab985b8468aff33f",
+   "Tag6LC": "3450bab340dd6d7868e11294c7549f2e",
+   "RN2": "e74c20d486254c5b"
+  },
+  "action": "Flip one bit of Tag6LC.",
+  "steps": [
+   "response: REJECT (tag verification of M2)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M2",
+  "expected": "REJECT",
+  "observed": "Step AKE3: Tag6LC mismatch (message integrity/authenticity check failed)",
+  "interpretation": "Same tag check at the sensor.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A05c-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06-M1.T6LN",
+  "title": "M1 field T6LN modified",
+  "plain_english": "Only T6LN of M1 is altered (all other fields intact).",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {},
+  "action": "Alter T6LN.",
+  "steps": [
+   "response: ACCEPT (-)"
+  ],
+  "outcome": "ACCEPT",
+  "responsible_check": "-",
+  "expected": "REJECT",
+  "observed": "accepted",
+  "interpretation": "Timestamp changed by +1 s (still fresh): ACCEPTED - the field is not cryptographically bound; it affects neither SK nor any check except freshness.",
+  "classification": "Vulnerable in the tested configuration",
+  "automated_test": "test_attack_lab[A06-M1.T6LN-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06-M1.D",
+  "title": "M1 field D modified",
+  "plain_english": "Only D of M1 is altered (all other fields intact).",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {},
+  "action": "Alter D.",
+  "steps": [
+   "response: REJECT (alias lookup in the 6LC database)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "alias lookup in the 6LC database",
+  "expected": "REJECT",
+  "observed": "Step AKE2: AID6LN not found in 6LC database",
+  "interpretation": "Detected by the check shown.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A06-M1.D-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06-M1.CT",
+  "title": "M1 field CT modified",
+  "plain_english": "Only CT of M1 is altered (all other fields intact).",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {},
+  "action": "Alter CT.",
+  "steps": [
+   "response: REJECT (tag verification of M1)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M1",
+  "expected": "REJECT",
+  "observed": "Step AKE2: Tag6LN mismatch (message integrity/authenticity check failed)",
+  "interpretation": "Detected by the check shown.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A06-M1.CT-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06-M1.Tag6LN",
+  "title": "M1 field Tag6LN modified",
+  "plain_english": "Only Tag6LN of M1 is altered (all other fields intact).",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {},
+  "action": "Alter Tag6LN.",
+  "steps": [
+   "response: REJECT (tag verification of M1)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M1",
+  "expected": "REJECT",
+  "observed": "Step AKE2: Tag6LN mismatch (message integrity/authenticity check failed)",
+  "interpretation": "Detected by the check shown.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A06-M1.Tag6LN-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06-M1.RN1",
+  "title": "M1 field RN1 modified",
+  "plain_english": "Only RN1 of M1 is altered (all other fields intact).",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {},
+  "action": "Alter RN1.",
+  "steps": [
+   "response: REJECT (RN1 consistency (clear RN1 vs RN1 hidden in B))"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "RN1 consistency (clear RN1 vs RN1 hidden in B)",
+  "expected": "REJECT",
+  "observed": "Step AKE2: RN1 mismatch between D-path and transmitted RN1",
+  "interpretation": "Detected by the check shown.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A06-M1.RN1-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06-M2.T6C",
+  "title": "M2 field T6C modified",
+  "plain_english": "Only T6C of M2 is altered (all other fields intact).",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {},
+  "action": "Alter T6C.",
+  "steps": [
+   "response: ACCEPT (-)"
+  ],
+  "outcome": "ACCEPT",
+  "responsible_check": "-",
+  "expected": "REJECT",
+  "observed": "accepted",
+  "interpretation": "Same for T6C: accepted; no effect on SK.",
+  "classification": "Vulnerable in the tested configuration",
+  "automated_test": "test_attack_lab[A06-M2.T6C-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06-M2.A1",
+  "title": "M2 field A1 modified",
+  "plain_english": "Only A1 of M2 is altered (all other fields intact).",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {},
+  "action": "Alter A1.",
+  "steps": [
+   "response: REJECT (A1 recomputation at the 6LN)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "A1 recomputation at the 6LN",
+  "expected": "REJECT",
+  "observed": "Step AKE3: A1 verification failed",
+  "interpretation": "Detected by the check shown.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A06-M2.A1-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06-M2.M",
+  "title": "M2 field M modified",
+  "plain_english": "Only M of M2 is altered (all other fields intact).",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {},
+  "action": "Alter M.",
+  "steps": [
+   "response: REJECT (session-key confirmation M' == M)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "session-key confirmation M' == M",
+  "expected": "REJECT",
+  "observed": "Step AKE3: session-key confirmation M mismatch",
+  "interpretation": "Detected by the check shown.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A06-M2.M-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06-M2.CT1",
+  "title": "M2 field CT1 modified",
+  "plain_english": "Only CT1 of M2 is altered (all other fields intact).",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {},
+  "action": "Alter CT1.",
+  "steps": [
+   "response: REJECT (tag verification of M2)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M2",
+  "expected": "REJECT",
+  "observed": "Step AKE3: Tag6LC mismatch (message integrity/authenticity check failed)",
+  "interpretation": "Detected by the check shown.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A06-M2.CT1-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06-M2.Tag6LC",
+  "title": "M2 field Tag6LC modified",
+  "plain_english": "Only Tag6LC of M2 is altered (all other fields intact).",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {},
+  "action": "Alter Tag6LC.",
+  "steps": [
+   "response: REJECT (tag verification of M2)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M2",
+  "expected": "REJECT",
+  "observed": "Step AKE3: Tag6LC mismatch (message integrity/authenticity check failed)",
+  "interpretation": "Detected by the check shown.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A06-M2.Tag6LC-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06-M2.RN2",
+  "title": "M2 field RN2 modified",
+  "plain_english": "Only RN2 of M2 is altered (all other fields intact).",
+  "attacker": "Active MITM, no secrets.",
+  "original_message": {},
+  "action": "Alter RN2.",
+  "steps": [
+   "response: REJECT (A1 recomputation at the 6LN)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "A1 recomputation at the 6LN",
+  "expected": "REJECT",
+  "observed": "Step AKE3: A1 verification failed",
+  "interpretation": "Detected by the check shown.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A06-M2.RN2-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06b-1",
+  "title": "[white-box] valid tag but wrong Sc inside A",
+  "plain_english": "A sender holding the keys builds A with a wrong Sc.",
+  "attacker": "Insider/compromised-sensor emulation (uses real keys).",
+  "original_message": {},
+  "action": "Build M1 with A = AID^RN1^Sc_wrong and a valid tag.",
+  "steps": [
+   "response: REJECT (Sc' legitimacy check)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "Sc' legitimacy check",
+  "expected": "REJECT",
+  "observed": "Step AKE2: Sc mismatch -- 6LN failed legitimacy check",
+  "interpretation": "Tests the receiver's Sc' check (reconstructed equation). Not an outsider attack.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A06b-1-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A06b-2",
+  "title": "[white-box] clear RN1 differs from RN1 hidden in B",
+  "plain_english": "A sender sends one RN1 in clear and another inside B.",
+  "attacker": "Insider emulation.",
+  "original_message": {},
+  "action": "Build M1 with mismatching RN1.",
+  "steps": [
+   "response: REJECT (RN1 consistency (clear RN1 vs RN1 hidden in B))"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "RN1 consistency (clear RN1 vs RN1 hidden in B)",
+  "expected": "REJECT",
+  "observed": "Step AKE2: RN1 mismatch between D-path and transmitted RN1",
+  "interpretation": "The audited code checks consistency between the two RN1 copies (this check is not in the paper).",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A06b-2-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A07a",
+  "title": "Unknown alias (random D)",
+  "plain_english": "The attacker invents an identity.",
+  "attacker": "Outsider, no secrets.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Replace D by random bytes.",
+  "steps": [
+   "response: REJECT (alias lookup in the 6LC database)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "alias lookup in the 6LC database",
+  "expected": "REJECT",
+  "observed": "Step AKE2: AID6LN not found in 6LC database",
+  "interpretation": "Lookup of AID6LN = TID6LC xor D fails; rejection happens before any decryption (cheap).",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A07a-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A07b",
+  "title": "Sensor registered with a different controller",
+  "plain_english": "A genuine sensor of another network contacts this controller.",
+  "attacker": "Foreign device.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "166ca582e7dc6034",
+   "CT": "afdabbca70b92dfe1769e87985102e21",
+   "Tag6LN": "f26c779a85b32285ee15cac8cf9eb1b5",
+   "RN1": "e13c76abc39d4546"
+  },
+  "action": "Deliver foreign M1.",
+  "steps": [
+   "response: REJECT (alias lookup in the 6LC database)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "alias lookup in the 6LC database",
+  "expected": "REJECT",
+  "observed": "Step AKE2: AID6LN not found in 6LC database",
+  "interpretation": "Alias unknown here.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A07b-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A08",
+  "title": "Wrong key",
+  "plain_english": "The attacker uses a key it guessed.",
+  "attacker": "Outsider without Si/AD.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "(1) primitive level: decrypt CT with a wrong Si; (2) protocol level: send M1 whose CT/Tag were made with the attacker's own key.",
+  "steps": [
+   "(1) wrong-key decrypt returns a plaintext equal to the true one? False; recomputed tag equals transmitted tag? False",
+   "(2) controller response: REJECT (tag verification of M1)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M1",
+  "expected": "REJECT",
+  "observed": "Step AKE2: Tag6LN mismatch (message integrity/authenticity check failed)",
+  "interpretation": "A wrong key yields garbage plaintext and a different tag; the tag check rejects. (Step 1 is a primitive-level illustration, step 2 uses only public wire material.)",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A08-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A09a",
+  "title": "Identity substitution: D of sensor Y on sensor X's ciphertext",
+  "plain_english": "The attacker splices fields of two captured messages.",
+  "attacker": "Active MITM with captured messages from two sensors.",
+  "original_message": {
+   "X": {
+    "T6LN": "6553f100",
+    "D": "4b556ad011b30094",
+    "CT": "8417fe930828e143566c5e7c4b677287",
+    "Tag6LN": "60b474a066e02b33c5638dfe99c066a6",
+    "RN1": "1ea4e5bd6048a5ff"
+   },
+   "Y": {
+    "T6LN": "6553f100",
+    "D": "a39c33ddffbc8ad8",
+    "CT": "eb6fd96723cb89ed3f2e635b1bf7d7aa",
+    "Tag6LN": "ad5131406f24235a4ff7edd225a139cc",
+    "RN1": "4d67e85a59110ce9"
+   }
+  },
+  "action": "Use D from Y with CT/Tag/RN1/T from X.",
+  "steps": [
+   "response: REJECT (tag verification of M1)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M1",
+  "expected": "REJECT",
+  "observed": "Step AKE2: Tag6LN mismatch (message integrity/authenticity check failed)",
+  "interpretation": "The controller decrypts with Y's keys; the tag fails.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A09a-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A09b",
+  "title": "Cross-delivery of M2 (X's reply delivered to Y)",
+  "plain_english": "The controller's reply for one sensor is handed to another.",
+  "attacker": "Active MITM.",
+  "original_message": {
+   "T6C": "000000006553f100",
+   "A1": "76eceee81f30c749",
+   "M": "72158ca5aaa81e72035af7846be65631d224c6aa",
+   "CT1": "8818a53ed672f79be443ca4124eaa4af",
+   "Tag6LC": "16c0d764013236af87c8841b1ab2ad5c",
+   "RN2": "a897b111ca601bcb"
+  },
+  "action": "Deliver X's M2 to Y's pending session.",
+  "steps": [
+   "response: REJECT (A1 recomputation at the 6LN)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "A1 recomputation at the 6LN",
+  "expected": "REJECT",
+  "observed": "Step AKE3: A1 verification failed",
+  "interpretation": "A1' uses Y's own K6LN and RN1, so it mismatches.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A09b-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A10a",
+  "title": "Impersonation with random fields",
+  "plain_english": "An outsider with no registration tries to log in.",
+  "attacker": "Outsider, no secrets, correct lengths only.",
+  "original_message": {},
+  "action": "Send a random 5-field M1.",
+  "steps": [
+   "response: REJECT (alias lookup in the 6LC database)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "alias lookup in the 6LC database",
+  "expected": "REJECT",
+  "observed": "Step AKE2: AID6LN not found in 6LC database",
+  "interpretation": "Unknown alias.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A10a-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A10b",
+  "title": "Impersonation with a captured alias (D) and random CT/Tag",
+  "plain_english": "The attacker reuses an observed D but cannot encrypt.",
+  "attacker": "Eavesdropper who saw D.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Keep D, T6LN, RN1; random CT and Tag.",
+  "steps": [
+   "response: REJECT (tag verification of M1)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "tag verification of M1",
+  "expected": "REJECT",
+  "observed": "Step AKE2: Tag6LN mismatch (message integrity/authenticity check failed)",
+  "interpretation": "Alias found, tag fails.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A10b-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A10c",
+  "title": "New session built from captured CT/Tag with a fresh RN1",
+  "plain_english": "The attacker tries to restart a session from recorded ciphertext.",
+  "attacker": "Eavesdropper.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Keep D, CT, Tag; replace the clear RN1.",
+  "steps": [
+   "response: REJECT (RN1 consistency (clear RN1 vs RN1 hidden in B))"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "RN1 consistency (clear RN1 vs RN1 hidden in B)",
+  "expected": "REJECT",
+  "observed": "Step AKE2: RN1 mismatch between D-path and transmitted RN1",
+  "interpretation": "Tag still verifies (RN1 is not covered by it) but the RN1 consistency check inside the code rejects.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A10c-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A11a",
+  "title": "M1 dropped",
+  "plain_english": "The first message never reaches the controller.",
+  "attacker": "Network attacker drops M1.",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Drop M1; the sensor starts a new session.",
+  "steps": [
+   "controller state unchanged (nothing received)",
+   "the sensor's pending state is overwritten by the next AKE1 (the code has NO timeout)",
+   "next session: AKE2 ACCEPT, AKE3 ACCEPT"
+  ],
+  "outcome": "ACCEPT",
+  "responsible_check": "-",
+  "expected": "later session works",
+  "observed": "later session works",
+  "interpretation": "Dropping M1 is harmless; no stuck state.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A11a-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A11b",
+  "title": "M2 dropped (desynchronisation)",
+  "plain_english": "The controller's reply is lost; the controller has already updated its state.",
+  "attacker": "Network attacker drops M2 (or the radio fails).",
+  "original_message": {
+   "T6LN": "6553f100",
+   "D": "4b556ad011b30094",
+   "CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "Tag6LN": "06f9ebb90da1007bf7d5a8728e1217ff",
+   "RN1": "4b05f2ae54a9265a"
+  },
+  "action": "Drop M2, then let the sensor retry 3 times.",
+  "steps": [
+   "controller already replaced its stored Sc and alias",
+   "sensor still holds the old state",
+   "retry 1: REJECT (alias lookup in the 6LC database)",
+   "retry 2: REJECT (alias lookup in the 6LC database)",
+   "retry 3: REJECT (alias lookup in the 6LC database)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "alias lookup / tag check",
+  "expected": "later session works",
+  "observed": "later sessions fail permanently",
+  "interpretation": "There is no recovery path: the controller keeps no previous state and the sensor cannot resynchronise. A single lost M2 permanently locks the device out until re-registration.",
+  "classification": "Vulnerable in the tested configuration",
+  "automated_test": "test_attack_lab[A11b-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A12a",
+  "title": "Duplicate M2",
+  "plain_english": "The reply is delivered twice.",
+  "attacker": "Duplication.",
+  "original_message": {
+   "T6C": "000000006553f100",
+   "A1": "6c96683e6794137c",
+   "M": "9b01426f1659a830f4ed2e8e6aedc3868827c1e0",
+   "CT1": "8818a53ed672f79bab985b8468aff33f",
+   "Tag6LC": "3450bab340dd6d7868e11294c7549f2e",
+   "RN2": "e74c20d486254c5b"
+  },
+  "action": "Deliver M2 twice to the sensor.",
+  "steps": [
+   "1st: ACCEPT",
+   "2nd: REJECT (no pending AKE1 session at the 6LN)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "no pending AKE1 session at the 6LN",
+  "expected": "REJECT",
+  "observed": "Step AKE3: no prior Step AKE1 session state",
+  "interpretation": "The sensor clears its pending session after success.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A12a-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A12b",
+  "title": "Old M2 delivered into a newer session",
+  "plain_english": "An M2 from session 1 is replayed while session 2 is pending.",
+  "attacker": "Replay of recorded M2.",
+  "original_message": {
+   "T6C": "000000006553f100",
+   "A1": "6c96683e6794137c",
+   "M": "9b01426f1659a830f4ed2e8e6aedc3868827c1e0",
+   "CT1": "8818a53ed672f79bab985b8468aff33f",
+   "Tag6LC": "3450bab340dd6d7868e11294c7549f2e",
+   "RN2": "e74c20d486254c5b"
+  },
+  "action": "Start session 2 (AKE1), then deliver the old M2.",
+  "steps": [
+   "response: REJECT (A1 recomputation at the 6LN)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "A1 recomputation at the 6LN",
+  "expected": "REJECT",
+  "observed": "Step AKE3: A1 verification failed",
+  "interpretation": "A1' depends on the pending RN1; the old M2 cannot match.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A12b-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A12c",
+  "title": "M2 arrives with no pending AKE1 (out of order)",
+  "plain_english": "A reply arrives before/without a request.",
+  "attacker": "Reordering/injection.",
+  "original_message": {
+   "T6C": "000000006553f100",
+   "A1": "6c96683e6794137c",
+   "M": "9b01426f1659a830f4ed2e8e6aedc3868827c1e0",
+   "CT1": "8818a53ed672f79bab985b8468aff33f",
+   "Tag6LC": "3450bab340dd6d7868e11294c7549f2e",
+   "RN2": "e74c20d486254c5b"
+  },
+  "action": "Deliver M2 to a sensor that has no pending session.",
+  "steps": [
+   "response: REJECT (no pending AKE1 session at the 6LN)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "no pending AKE1 session at the 6LN",
+  "expected": "REJECT",
+  "observed": "Step AKE3: no prior Step AKE1 session state",
+  "interpretation": "Explicit no-session check.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A12c-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A14",
+  "title": "Session-key agreement and cross-session isolation",
+  "plain_english": "Run five sessions in a row and compare keys and fresh values.",
+  "attacker": "None (property test).",
+  "original_message": {},
+  "action": "5 sequential sessions; replay every earlier M1.",
+  "steps": [
+   "within-session key equality (5 sessions): [True, True, True, True, True]",
+   "all 5 session keys distinct: True",
+   "RN1 distinct: True, RN2 distinct: True",
+   "D (clear alias mask) distinct across sessions: True",
+   "old M1 of sessions 1-4 replayed now: ['REJECT', 'REJECT', 'REJECT', 'REJECT']"
+  ],
+  "outcome": "ACCEPT",
+  "responsible_check": "-",
+  "expected": "keys equal inside sessions, different across sessions, old M1 rejected",
+  "observed": "as expected",
+  "interpretation": "Fresh RN1/RN2 give a fresh SK; old messages do not start new sessions (via state transition).",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A14-reconstructed]",
+  "extra": {
+   "D_changes": true
+  }
+ },
+ {
+  "id": "A15",
+  "title": "Alias rotation and traceability",
+  "plain_english": "Does the identifier that appears on the wire (D) change from session to session?",
+  "attacker": "Passive eavesdropper trying to link sessions.",
+  "original_message": {
+   "D values": [
+    "4b556ad011b30094",
+    "18348f6d542c0ec4",
+    "186ac8e76fa33fe2"
+   ]
+  },
+  "action": "Observe D in three consecutive sessions.",
+  "steps": [
+   "AID6LN changed after each session: [True, True, True]",
+   "update equation: AID6LN' = H_bits(AID6LN || SK, 64)  [RECONSTRUCTION; the paper gives no update equation]",
+   "D sequence: ['4b556ad011b30094', '18348f6d542c0ec4', '186ac8e76fa33fe2']",
+   "sessions linkable by identical D: False"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "-",
+  "expected": "D differs every session (paper: Prop.3 claims an alias that changes)",
+  "observed": "D differs",
+  "interpretation": "This demonstrates the RECONSTRUCTED implementation, not a literal paper equation.",
+  "classification": "Protected in the tested configuration",
+  "automated_test": "test_attack_lab[A15-reconstructed]",
+  "extra": {
+   "linkable": false
+  }
+ },
+ {
+  "id": "A16",
+  "title": "Denial-of-service considerations (local processing cost only)",
+  "plain_english": "How much work does the controller do before rejecting garbage? No network flooding is performed.",
+  "attacker": "Message flooder (simulated locally, 200 calls per case).",
+  "original_message": {},
+  "action": "Feed malformed / forged M1 to step_ake2 in a local loop and count operations.",
+  "steps": [
+   "wrong-length fields (truncated CT): REJECT via 'unhandled ValueError (no explicit validation)'; logical ops/msg {'xor': 4.0, 'hash': 2.0}; ~85.1 us/msg (local, 200 msgs)",
+   "random alias (unknown D): REJECT via 'alias lookup in the 6LC database'; logical ops/msg {'xor': 1.0}; ~33.6 us/msg (local, 200 msgs)",
+   "valid alias + forged tag (D captured in flight): REJECT via 'tag verification of M1'; logical ops/msg {'xor': 4.0, 'hash': 2.0, 'aead-decrypt': 1.0, 'compare': 1.0}; ~135.6 us/msg (local, 200 msgs)"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "various",
+  "expected": "cheap rejection of garbage",
+  "observed": "rejected; costs shown",
+  "interpretation": "Unknown aliases are rejected after one XOR and a dictionary lookup; a known alias with a forged tag forces key derivation and an AEAD decryption per message; malformed lengths are rejected by unhandled ValueError (works, but not graceful). The code has no rate limiting.",
+  "classification": "Partially protected",
+  "automated_test": "test_attack_lab[A16-reconstructed]",
+  "extra": {
+   "rows": [
+    [
+     "wrong-length fields (truncated CT)",
+     "REJECT",
+     "unhandled ValueError (no explicit validation)",
+     {
+      "xor": 4.0,
+      "hash": 2.0
+     },
+     85.1
+    ],
+    [
+     "random alias (unknown D)",
+     "REJECT",
+     "alias lookup in the 6LC database",
+     {
+      "xor": 1.0
+     },
+     33.6
+    ],
+    [
+     "valid alias + forged tag (D captured in flight)",
+     "REJECT",
+     "tag verification of M1",
+     {
+      "xor": 4.0,
+      "hash": 2.0,
+      "aead-decrypt": 1.0,
+      "compare": 1.0
+     },
+     135.6
+    ]
+   ]
+  }
+ },
+ {
+  "id": "A17",
+  "title": "Passive keystream-reuse analysis of one session (M1 xor M2)",
+  "plain_english": "An eavesdropper XORs the two ciphertexts of one session.",
+  "attacker": "Passive eavesdropper; sees only M1 and M2.",
+  "original_message": {
+   "M1.CT": "d1b6e9803cc962e603cd496f7f86f122",
+   "M2.CT1": "8818a53ed672f79bab985b8468aff33f"
+  },
+  "action": "CT xor CT1 = (A||B) xor (Sc1||RN2); second half = B xor RN2 = AID6LN xor RN1 xor RN2; RN1, RN2 are public, so AID6LN falls out; TID6LC = D xor AID6LN.",
+  "steps": [
+   "recovered AID6LN equals the true AID6LN: True",
+   "recovered TID6LC equals the true TID6LC: True"
+  ],
+  "outcome": "ACCEPT",
+  "responsible_check": "-",
+  "expected": "AID6LN stays hidden",
+  "observed": "AID6LN and TID6LC recovered",
+  "interpretation": "M1 and M2 are encrypted with the SAME Si (the paper itself says Si' is used for CT1; the audited code uses Si'' = Si'), i.e. same AES-CTR key and counter block, hence the same keystream. Reported as a weakness of the specified construction, not of the stand-in cipher: any nonce-based AEAD fails under key+nonce reuse.",
+  "classification": "Vulnerable in the tested configuration",
+  "automated_test": "test_attack_lab[A17-reconstructed]",
+  "extra": {
+   "recovered": true
+  }
+ },
+ {
+  "id": "A18",
+  "title": "Passive attempt to compute SK from the transcript (with AID6LN recovered via A17)",
+  "plain_english": "Can the eavesdropper form the session key?",
+  "attacker": "Passive eavesdropper that also exploited A17.",
+  "original_message": {},
+  "action": "Compute SHA-1(AID||B1||Sc1||RN1||RN2) with the known AID, RN1, RN2 and 100 guesses for the unknown B1, Sc1.",
+  "steps": [
+   "session key among 100 guesses: False"
+  ],
+  "outcome": "REJECT",
+  "responsible_check": "-",
+  "expected": "SK not derivable",
+  "observed": "not derived in this attempt",
+  "interpretation": "SK still needs B1 (RN2 xor K6LN) and Sc1, both secret; the tested guesses failed. This is NOT a proof of secrecy.",
+  "classification": "Partially protected",
+  "automated_test": "test_attack_lab[A18-reconstructed]",
+  "extra": {}
+ },
+ {
+  "id": "A13",
+  "title": "Altered identity, nonce and session values (summary of A06)",
+  "plain_english": "Each identity/nonce/session field altered separately.",
+  "attacker": "Active MITM.",
+  "original_message": {},
+  "action": "see A06 rows",
+  "steps": [
+   "M1.D: REJECT via alias lookup in the 6LC database",
+   "M1.RN1: REJECT via RN1 consistency (clear RN1 vs RN1 hidden in B)",
+   "M2.RN2: REJECT via A1 recomputation at the 6LN",
+   "M1.T6LN: ACCEPT via -",
+   "M2.T6C: ACCEPT via -",
+   "M2.A1: REJECT via A1 recomputation at the 6LN",
+   "M2.M: REJECT via session-key confirmation M' == M"
+  ],
+  "outcome": "MIXED",
+  "responsible_check": "see steps",
+  "expected": "REJECT",
+  "observed": "see steps",
+  "interpretation": "Identity (D), nonces (RN1, RN2) and A1/M are detected; the two timestamps are accepted when changed within the window.",
+  "classification": "Partially protected",
+  "automated_test": "test_attack_lab[A13-reconstructed]",
+  "extra": {}
+ }
+]
